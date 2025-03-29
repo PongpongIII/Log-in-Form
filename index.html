@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register and Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Registration Form -->
+    <div id="register-form">
+      <h1>Register</h1>
+      <label for="username">Username</label>
+      <input type="text" id="reg-username" placeholder="Enter Username" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="reg-password" placeholder="Enter Password" required>
+
+      <label for="reg-image">Profile Image</label>
+      <input type="file" id="reg-image" required>
+      
+      <button id="register-btn">Register</button>
+      <p id="register-error"></p>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" style="display: none;">
+      <h1>Login</h1>
+      <label for="login-username">Username</label>
+      <input type="text" id="login-username" placeholder="Enter Username" required>
+
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="Enter Password" required>
+
+      <button id="login-btn">Login</button>
+      <p id="login-error"></p>
+    </div>
+
+    <!-- Welcome Message after Login -->
+    <div id="welcome-message" style="display: none;">
+      <h1>Welcome, <span id="username-display"></span></h1>
+      <CENTER><img id="user-image" src="" alt="User Profile Image" style="max-width: 150px; border-radius: 50%; margin-top: 20px;"></CENTER>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+  }
+
+  .container {
+    width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  p {
+    text-align: center;
+    color: red;
+    font-size: 14px;
+  }
+
+  .success {
+    color: green;
+  }
+
+  #user-image {
+    border-radius: 50%;
+    max-width: 150px;
+  }
+</style>
+
+<script>
+// Handle user registration
+document.getElementById('register-btn').addEventListener('click', function() {
+  const username = document.getElementById('reg-username').value;
+  const password = document.getElementById('reg-password').value;
+  const imageInput = document.getElementById('reg-image');
+  const errorMsg = document.getElementById('register-error');
+
+  // Check if the user provided a username, password, and image
+  if (username && password && imageInput.files.length > 0) {
+    // Save user data in local storage (this is a simulation, not secure)
+    localStorage.setItem('username', username);
+    localStorage.setItem('password', password);
+
+    // Read the image file
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      // Save the image (base64 string) in localStorage
+      localStorage.setItem('profileImage', event.target.result);
+
+      // Show success message
+      errorMsg.textContent = 'Registration successful! Now login.';
+      errorMsg.classList.add('success');
+    };
+    
+    reader.onerror = function(error) {
+      errorMsg.textContent = 'Error reading the image file.';
+    };
+
+    // Read the selected image file
+    reader.readAsDataURL(imageInput.files[0]);
+
+    // Show the login form and hide the register form
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('login-form').style.display = 'block';
+  } else {
+    errorMsg.textContent = 'Please fill out all fields and select an image.';
+  }
+});
+
+// Handle user login
+document.getElementById('login-btn').addEventListener('click', function() {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+  const errorMsg = document.getElementById('login-error');
+
+  const storedUsername = localStorage.getItem('username');
+  const storedPassword = localStorage.getItem('password');
+  const storedImage = localStorage.getItem('profileImage');
+
+  // Check if the user is registered and entered correct details
+  if (!storedUsername || !storedPassword) {
+    errorMsg.textContent = 'You need to register first.';
+  } else if (username === storedUsername && password === storedPassword) {
+    errorMsg.textContent = 'Login successful!';
+    errorMsg.style.color = 'green';
+
+    // Hide login form and show welcome message with username and profile image
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('welcome-message').style.display = 'block';
+    document.getElementById('username-display').textContent = storedUsername;
+
+    // Display the profile image if available
+    const userImage = document.getElementById('user-image');
+    if (storedImage) {
+      userImage.src = storedImage;  // Set the src of the img tag to the base64 image
+    } else {
+      console.log("No profile image found in localStorage");  // Debugging line
+    }
+  } else {
+    errorMsg.textContent = 'Invalid username or password.';
+  }
+});
+</script>
